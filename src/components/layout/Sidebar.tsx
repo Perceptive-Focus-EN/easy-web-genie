@@ -50,6 +50,9 @@ export const Sidebar = () => {
         </div>
       </ResizablePanel>
       <ResizableHandle withHandle />
+      <ResizablePanel defaultSize={75}>
+        <div className="h-full" />
+      </ResizablePanel>
     </ResizablePanelGroup>
   );
 };

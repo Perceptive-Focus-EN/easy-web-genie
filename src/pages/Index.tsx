@@ -8,12 +8,7 @@ const Index = () => {
     <div className="flex h-screen flex-col">
       <Header />
       <div className="flex-1 overflow-hidden">
-        <div className="flex h-full">
-          <Sidebar />
-          <main className="flex-1">
-            <Preview />
-          </main>
-        </div>
+        <Sidebar />
       </div>
     </div>
   );
