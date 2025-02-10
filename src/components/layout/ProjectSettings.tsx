@@ -1,13 +1,24 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export const ProjectSettings = () => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="space-y-6 py-6">
+    <div className={cn(
+      "space-y-6",
+      isMobile ? "py-4 px-4" : "py-6"
+    )}>
       <div>
-        <h2 className="text-lg font-semibold">Project Settings</h2>
+        <h2 className={cn(
+          "font-semibold",
+          isMobile ? "text-base" : "text-lg"
+        )}>
+          Project Settings
+        </h2>
         <p className="text-sm text-muted-foreground">
           View and manage your project settings.
         </p>

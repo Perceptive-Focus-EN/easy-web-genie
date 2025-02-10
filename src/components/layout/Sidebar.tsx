@@ -6,23 +6,29 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { cn } from "@/lib/utils";
 import { Chat } from "../chat/Chat";
 import { History as HistoryView } from "../history/History";
+import { Preview } from "../preview/Preview";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeView, setActiveView] = useState<"chat" | "history">("chat");
+  const isMobile = useIsMobile();
 
   return (
-    <ResizablePanelGroup direction="horizontal">
+    <ResizablePanelGroup 
+      direction="horizontal"
+      className="min-h-0"
+    >
       <ResizablePanel
         defaultSize={25}
-        minSize={20}
-        maxSize={40}
-        collapsible
+        minSize={isMobile ? 100 : 20}
+        maxSize={isMobile ? 100 : 40}
+        collapsible={!isMobile}
         onCollapse={() => setIsCollapsed(true)}
         onExpand={() => setIsCollapsed(false)}
         className={cn(
           "flex flex-col",
-          isCollapsed && "min-w-[50px] transition-all duration-300 ease-in-out"
+          isCollapsed && !isMobile && "min-w-[50px] transition-all duration-300 ease-in-out"
         )}
       >
         <div className="flex h-14 items-center justify-between border-b px-2">
@@ -49,10 +55,17 @@ export const Sidebar = () => {
           {activeView === "chat" ? <Chat /> : <HistoryView />}
         </div>
       </ResizablePanel>
-      <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={75}>
-        <div className="h-full" />
-      </ResizablePanel>
+      {(!isMobile || !isCollapsed) && (
+        <>
+          <ResizableHandle withHandle />
+          <ResizablePanel 
+            defaultSize={75}
+            className="min-h-0"
+          >
+            <Preview />
+          </ResizablePanel>
+        </>
+      )}
     </ResizablePanelGroup>
   );
 };
