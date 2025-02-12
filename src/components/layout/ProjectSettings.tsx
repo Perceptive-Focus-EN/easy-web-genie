@@ -4,9 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useSettingsStore } from "@/stores/useSettingsStore";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export const ProjectSettings = () => {
   const isMobile = useIsMobile();
+  const { settings } = useSettingsStore();
+  const { projectInfo, visibility } = settings;
 
   return (
     <div className={cn(
@@ -35,19 +39,19 @@ export const ProjectSettings = () => {
         <div className="space-y-2">
           <div>
             <label className="text-sm font-medium">Project name</label>
-            <p className="text-sm text-muted-foreground">easy-web-genius</p>
+            <p className="text-sm text-muted-foreground">{projectInfo.name}</p>
           </div>
           <div>
             <label className="text-sm font-medium">Owner</label>
-            <p className="text-sm text-muted-foreground">@mtwjLwFUX6Ty9iy1VWUskSdohkE2</p>
+            <p className="text-sm text-muted-foreground">{projectInfo.owner}</p>
           </div>
           <div>
             <label className="text-sm font-medium">Created at</label>
-            <p className="text-sm text-muted-foreground">2025-02-10 12:57:49</p>
+            <p className="text-sm text-muted-foreground">{projectInfo.createdAt}</p>
           </div>
           <div>
             <label className="text-sm font-medium">Tech stack</label>
-            <p className="text-sm text-muted-foreground">vite_react_shadcn_ts</p>
+            <p className="text-sm text-muted-foreground">{projectInfo.techStack}</p>
           </div>
         </div>
       </div>
@@ -62,11 +66,13 @@ export const ProjectSettings = () => {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Public</span>
+              <span className="text-sm font-medium">
+                {visibility.isPublic ? 'Public' : 'Private'}
+              </span>
               <Badge>Current</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Anyone can view and remix from your profile.
+              {visibility.description}
             </p>
           </div>
         </div>
@@ -79,7 +85,26 @@ export const ProjectSettings = () => {
             These actions are irreversible. Proceed with caution.
           </p>
         </div>
-        <Button variant="destructive">Delete Project</Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">Delete Project</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your
+                project and remove all of its contents from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction className="bg-destructive text-destructive-foreground">
+                Delete Project
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
