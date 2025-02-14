@@ -8,11 +8,26 @@ import { Chat } from "../chat/Chat";
 import { History as HistoryView } from "../history/History";
 import { Preview } from "../preview/Preview";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeView, setActiveView] = useState<"chat" | "history">("chat");
   const isMobile = useIsMobile();
+
+  const handleViewChange = (view: "chat" | "history") => {
+    setActiveView(view);
+    toast({
+      title: `Switched to ${view} view`,
+      description: `You are now viewing the ${view.toLowerCase()} view.`,
+    });
+  };
 
   return (
     <ResizablePanelGroup 
@@ -33,22 +48,41 @@ export const Sidebar = () => {
       >
         <div className="flex h-14 items-center justify-between border-b px-2">
           <div className="flex items-center gap-2">
-            <Button
-              variant={activeView === "chat" ? "default" : "ghost"}
-              size="icon"
-              className="h-9 w-9"
-              onClick={() => setActiveView("chat")}
-            >
-              <MessageSquare className="h-5 w-5" />
-            </Button>
-            <Button
-              variant={activeView === "history" ? "default" : "ghost"}
-              size="icon"
-              className="h-9 w-9"
-              onClick={() => setActiveView("history")}
-            >
-              <History className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activeView === "chat" ? "default" : "ghost"}
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => handleViewChange("chat")}
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Chat View</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={activeView === "history" ? "default" : "ghost"}
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => handleViewChange("history")}
+                  >
+                    <History className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>History View</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
         <div className="flex-1 overflow-auto">
