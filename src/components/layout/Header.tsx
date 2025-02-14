@@ -7,11 +7,41 @@ import { ProjectSettings } from "./ProjectSettings";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui/use-toast";
 
 export const Header = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+
+  const handleDatabaseClick = () => {
+    toast({
+      title: "Database Connection",
+      description: "Connect to your database through the Supabase integration.",
+    });
+  };
+
+  const handleGithubClick = () => {
+    toast({
+      title: "GitHub Repository",
+      description: "Connect your project to GitHub to sync your changes.",
+    });
+  };
+
+  const handleUploadClick = () => {
+    toast({
+      title: "Upload Files",
+      description: "Upload files to your project through the file manager.",
+    });
+  };
+
+  const handleNavigate = (path: string, label: string) => {
+    navigate(path);
+    toast({
+      title: `Navigating to ${label}`,
+      description: `You are now viewing the ${label.toLowerCase()} page.`,
+    });
+  };
 
   return (
     <header className="h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -20,7 +50,7 @@ export const Header = () => {
           <Button 
             variant="ghost" 
             className="font-semibold"
-            onClick={() => navigate('/')}
+            onClick={() => handleNavigate('/', 'Home')}
           >
             <Home className="h-5 w-5 mr-2" />
             <span className={cn(
@@ -35,26 +65,41 @@ export const Header = () => {
             <>
               <Button 
                 variant="ghost"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => handleNavigate('/dashboard', 'Dashboard')}
               >
                 Dashboard
               </Button>
               <Button 
                 variant="ghost"
-                onClick={() => navigate('/profile')}
+                onClick={() => handleNavigate('/profile', 'Profile')}
               >
                 Profile
               </Button>
             </>
           )}
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-9 w-9"
+            onClick={handleDatabaseClick}
+          >
             <Database className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-9 w-9"
+            onClick={handleGithubClick}
+          >
             <Github className="h-5 w-5" />
           </Button>
           {!isMobile && (
-            <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-9 w-9"
+              onClick={handleUploadClick}
+            >
               <Upload className="h-5 w-5" />
             </Button>
           )}
