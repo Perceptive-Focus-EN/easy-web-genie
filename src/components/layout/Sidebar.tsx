@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -22,12 +22,55 @@ export const Sidebar = () => {
   const isMobile = useIsMobile();
 
   const handleViewChange = (view: "chat" | "history") => {
-    setActiveView(view);
+    if (view === activeView) return;
+    
+    // Smooth transition effect
+    const container = document.querySelector('.view-container');
+    if (container) {
+      container.classList.add('opacity-0');
+      setTimeout(() => {
+        setActiveView(view);
+        container.classList.remove('opacity-0');
+      }, 150);
+    } else {
+      setActiveView(view);
+    }
+
     toast({
       title: `Switched to ${view} view`,
       description: `You are now viewing the ${view.toLowerCase()} view.`,
     });
   };
+
+  const handleCollapse = (collapsed: boolean) => {
+    setIsCollapsed(collapsed);
+    // Add transition effect
+    const sidebar = document.querySelector('.sidebar-panel');
+    if (sidebar) {
+      sidebar.classList.toggle('collapsed', collapsed);
+    }
+  };
+
+  useEffect(() => {
+    // Add transition styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .view-container {
+        transition: opacity 0.15s ease-in-out;
+      }
+      .sidebar-panel {
+        transition: width 0.3s ease-in-out;
+      }
+      .sidebar-panel.collapsed {
+        width: 50px !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <ResizablePanelGroup 
@@ -39,10 +82,10 @@ export const Sidebar = () => {
         minSize={isMobile ? 100 : 20}
         maxSize={isMobile ? 100 : 40}
         collapsible={!isMobile}
-        onCollapse={() => setIsCollapsed(true)}
-        onExpand={() => setIsCollapsed(false)}
+        onCollapse={() => handleCollapse(true)}
+        onExpand={() => handleCollapse(false)}
         className={cn(
-          "flex flex-col",
+          "flex flex-col sidebar-panel",
           isCollapsed && !isMobile && "min-w-[50px] transition-all duration-300 ease-in-out"
         )}
       >
@@ -85,7 +128,7 @@ export const Sidebar = () => {
             </TooltipProvider>
           </div>
         </div>
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto view-container">
           {activeView === "chat" ? <Chat /> : <HistoryView />}
         </div>
       </ResizablePanel>

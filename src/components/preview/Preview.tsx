@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Expand, Code, Eye, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -14,10 +14,22 @@ import {
 export const Preview = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [view, setView] = useState<"preview" | "code">("preview");
+  const [codeContent, setCodeContent] = useState<string>("");
   const isMobile = useIsMobile();
 
   const handleViewChange = (newView: "preview" | "code") => {
     setView(newView);
+    if (newView === "code") {
+      // In a real app, this would fetch the current file's content
+      setCodeContent(`// Example code content
+import React from 'react';
+
+const MyComponent = () => {
+  return <div>Hello World</div>;
+};
+
+export default MyComponent;`);
+    }
     toast({
       title: `Switched to ${newView} view`,
       description: `You are now viewing the ${newView.toLowerCase()} view.`,
@@ -26,11 +38,42 @@ export const Preview = () => {
 
   const handleExpand = () => {
     setIsExpanded(!isExpanded);
+    const previewContainer = document.querySelector('.preview-container');
+    if (previewContainer) {
+      previewContainer.classList.toggle('expanded', !isExpanded);
+    }
     toast({
       title: isExpanded ? "Collapsed View" : "Expanded View",
       description: `The preview is now ${isExpanded ? "collapsed" : "expanded"}.`,
     });
   };
+
+  const handleBack = () => {
+    if (isMobile) {
+      // Handle mobile back navigation
+      window.history.back();
+    }
+  };
+
+  useEffect(() => {
+    // Add expanded styles
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .preview-container.expanded {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 50;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -40,7 +83,12 @@ export const Preview = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 lg:hidden">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-9 w-9 lg:hidden"
+                    onClick={handleBack}
+                  >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
@@ -89,7 +137,7 @@ export const Preview = () => {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 preview-container">
         {view === "preview" ? (
           <div className="h-full w-full">
             <iframe
@@ -99,9 +147,9 @@ export const Preview = () => {
             />
           </div>
         ) : (
-          <div className="h-full w-full overflow-auto p-4">
+          <div className="h-full w-full overflow-auto p-4 bg-background">
             <pre className="text-sm">
-              {/* Code view content will be rendered here */}
+              {codeContent}
             </pre>
           </div>
         )}
