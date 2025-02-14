@@ -5,12 +5,55 @@ import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
+import { ProjectInfo, ProjectVisibility } from "@/types/settings";
 
 export const ProjectSettings = () => {
   const isMobile = useIsMobile();
-  const { settings } = useSettingsStore();
+  const { settings, deleteProject } = useSettingsStore();
   const { projectInfo, visibility } = settings;
+
+  const handleDeleteProject = async () => {
+    try {
+      await deleteProject();
+      toast({
+        title: "Project deleted",
+        description: "Your project has been successfully deleted.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete project. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  const renderProjectInfoField = (
+    label: string, 
+    value: string, 
+    key: keyof ProjectInfo
+  ) => (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <p className="text-sm text-muted-foreground">{value}</p>
+    </div>
+  );
 
   return (
     <div className={cn(
@@ -37,22 +80,10 @@ export const ProjectSettings = () => {
           </p>
         </div>
         <div className="space-y-2">
-          <div>
-            <label className="text-sm font-medium">Project name</label>
-            <p className="text-sm text-muted-foreground">{projectInfo.name}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Owner</label>
-            <p className="text-sm text-muted-foreground">{projectInfo.owner}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Created at</label>
-            <p className="text-sm text-muted-foreground">{projectInfo.createdAt}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Tech stack</label>
-            <p className="text-sm text-muted-foreground">{projectInfo.techStack}</p>
-          </div>
+          {renderProjectInfoField("Project name", projectInfo.name, "name")}
+          {renderProjectInfoField("Owner", projectInfo.owner, "owner")}
+          {renderProjectInfoField("Created at", formatDate(projectInfo.createdAt), "createdAt")}
+          {renderProjectInfoField("Tech stack", projectInfo.techStack, "techStack")}
         </div>
       </div>
       <Separator />
@@ -99,7 +130,10 @@ export const ProjectSettings = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground">
+              <AlertDialogAction 
+                className="bg-destructive text-destructive-foreground"
+                onClick={handleDeleteProject}
+              >
                 Delete Project
               </AlertDialogAction>
             </AlertDialogFooter>

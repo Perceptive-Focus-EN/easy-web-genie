@@ -1,11 +1,12 @@
 
 import { create } from 'zustand';
-import { ProjectSettings } from '@/types/settings';
+import { ProjectSettings, ProjectInfo, ProjectVisibility } from '@/types/settings';
 
 interface SettingsStore {
   settings: ProjectSettings;
-  updateProjectInfo: (info: Partial<ProjectSettings['projectInfo']>) => void;
-  updateVisibility: (visibility: ProjectSettings['visibility']) => void;
+  updateProjectInfo: (info: Partial<ProjectInfo>) => void;
+  updateVisibility: (visibility: ProjectVisibility) => void;
+  deleteProject: () => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
@@ -18,6 +19,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     },
     visibility: {
       isPublic: true,
+      status: 'public',
       description: 'Anyone can view and remix from your profile.',
     },
   },
@@ -32,4 +34,13 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     set((state) => ({
       settings: { ...state.settings, visibility },
     })),
+  deleteProject: async () => {
+    try {
+      // Here you would typically make an API call to delete the project
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Reset the store or handle navigation after successful deletion
+    } catch (error) {
+      throw new Error('Failed to delete project');
+    }
+  },
 }));
