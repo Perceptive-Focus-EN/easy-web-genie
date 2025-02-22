@@ -42,10 +42,10 @@ export const Sidebar = () => {
   };
 
   const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+    setIsCollapsed((prev) => !prev);
     toast({
-      title: isCollapsed ? "Sidebar Expanded" : "Sidebar Collapsed",
-      description: `The sidebar is now ${isCollapsed ? "expanded" : "collapsed"}.`,
+      title: !isCollapsed ? "Sidebar Collapsed" : "Sidebar Expanded",
+      description: `The sidebar is now ${!isCollapsed ? "collapsed" : "expanded"}.`,
     });
   };
 
@@ -56,7 +56,7 @@ export const Sidebar = () => {
         transition: opacity 0.15s ease-in-out;
       }
       .sidebar-panel {
-        transition: all 0.3s ease-in-out;
+        transition: width 0.3s ease-in-out;
       }
     `;
     document.head.appendChild(style);
@@ -72,13 +72,12 @@ export const Sidebar = () => {
       className="min-h-0"
     >
       <ResizablePanel
-        defaultSize={25}
-        minSize={isCollapsed ? 5 : (isMobile ? 100 : 20)}
-        maxSize={isCollapsed ? 5 : (isMobile ? 100 : 40)}
-        collapsible={false}
+        defaultSize={isCollapsed ? 5 : 25}
+        minSize={15}
+        maxSize={40}
         className={cn(
           "flex flex-col sidebar-panel",
-          isCollapsed && "max-w-[50px] min-w-[50px]"
+          isCollapsed && "!w-[50px] !min-w-[50px] !max-w-[50px]"
         )}
       >
         <div className="flex h-14 items-center justify-between border-b px-2">
@@ -149,17 +148,13 @@ export const Sidebar = () => {
           </div>
         )}
       </ResizablePanel>
-      {(!isMobile || !isCollapsed) && (
-        <>
-          <ResizableHandle withHandle />
-          <ResizablePanel 
-            defaultSize={75}
-            className="min-h-0"
-          >
-            <Preview />
-          </ResizablePanel>
-        </>
-      )}
+      <ResizableHandle withHandle />
+      <ResizablePanel 
+        defaultSize={75}
+        className="min-h-0"
+      >
+        <Preview />
+      </ResizablePanel>
     </ResizablePanelGroup>
   );
 };
