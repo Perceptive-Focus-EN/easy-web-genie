@@ -2,12 +2,17 @@
 import { create } from 'zustand';
 import { ProjectSettings, ProjectInfo, ProjectVisibility } from '@/types/settings';
 
-interface SettingsStore {
+interface SettingsState {
   settings: ProjectSettings;
+}
+
+interface SettingsActions {
   updateProjectInfo: (info: Partial<ProjectInfo>) => void;
   updateVisibility: (visibility: ProjectVisibility) => void;
   deleteProject: () => Promise<void>;
 }
+
+type SettingsStore = SettingsState & SettingsActions;
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
   settings: {
@@ -37,7 +42,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
   deleteProject: async () => {
     try {
       // Here you would typically make an API call to delete the project
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
       // Reset the store or handle navigation after successful deletion
     } catch (error) {
       throw new Error('Failed to delete project');

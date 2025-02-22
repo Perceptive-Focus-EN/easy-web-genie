@@ -25,3 +25,5 @@ export type ProjectSettingsAction =
   | { type: 'UPDATE_PROJECT_INFO'; payload: Partial<ProjectInfo> }
   | { type: 'UPDATE_VISIBILITY'; payload: ProjectVisibility }
   | { type: 'DELETE_PROJECT' };
+
+export type ToastVariant = "default" | "destructive";

@@ -17,42 +17,62 @@ import {
   AlertDialogTrigger 
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { ProjectInfo, ProjectVisibility } from "@/types/settings";
+import { ProjectInfo, ToastVariant } from "@/types/settings";
 
-export const ProjectSettings = () => {
+interface ProjectInfoFieldProps {
+  label: string;
+  value: string;
+  fieldKey: keyof ProjectInfo;
+}
+
+const ProjectInfoField: React.FC<ProjectInfoFieldProps> = ({ label, value, fieldKey }) => (
+  <div>
+    <label className="text-sm font-medium">{label}</label>
+    <p className="text-sm text-muted-foreground">{value}</p>
+  </div>
+);
+
+export const ProjectSettings: React.FC = () => {
   const isMobile = useIsMobile();
   const { settings, deleteProject } = useSettingsStore();
   const { projectInfo, visibility } = settings;
 
-  const handleDeleteProject = async () => {
+  const handleDeleteProject = async (): Promise<void> => {
     try {
       await deleteProject();
-      toast({
-        title: "Project deleted",
-        description: "Your project has been successfully deleted.",
-      });
+      showToast("Project deleted", "Your project has been successfully deleted.", "default");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete project. Please try again.",
-        variant: "destructive",
-      });
+      showToast("Error", "Failed to delete project. Please try again.", "destructive");
     }
   };
 
+  const showToast = (title: string, description: string, variant: ToastVariant): void => {
+    toast({
+      title,
+      description,
+      variant,
+    });
+  };
+
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString();
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date string');
+    }
+    return date.toLocaleString();
   };
 
   const renderProjectInfoField = (
     label: string, 
     value: string, 
-    key: keyof ProjectInfo
-  ) => (
-    <div>
-      <label className="text-sm font-medium">{label}</label>
-      <p className="text-sm text-muted-foreground">{value}</p>
-    </div>
+    fieldKey: keyof ProjectInfo
+  ): JSX.Element => (
+    <ProjectInfoField 
+      key={fieldKey}
+      label={label}
+      value={value}
+      fieldKey={fieldKey}
+    />
   );
 
   return (
