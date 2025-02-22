@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { MessageSquare, History } from "lucide-react";
+import { MessageSquare, History, PanelLeftClose, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,6 @@ export const Sidebar = () => {
   const handleViewChange = (view: "chat" | "history") => {
     if (view === activeView) return;
     
-    // Smooth transition effect
     const container = document.querySelector('.view-container');
     if (container) {
       container.classList.add('opacity-0');
@@ -42,27 +41,22 @@ export const Sidebar = () => {
     });
   };
 
-  const handleCollapse = (collapsed: boolean) => {
-    setIsCollapsed(collapsed);
-    // Add transition effect
-    const sidebar = document.querySelector('.sidebar-panel');
-    if (sidebar) {
-      sidebar.classList.toggle('collapsed', collapsed);
-    }
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+    toast({
+      title: isCollapsed ? "Sidebar Expanded" : "Sidebar Collapsed",
+      description: `The sidebar is now ${isCollapsed ? "expanded" : "collapsed"}.`,
+    });
   };
 
   useEffect(() => {
-    // Add transition styles
     const style = document.createElement('style');
     style.innerHTML = `
       .view-container {
         transition: opacity 0.15s ease-in-out;
       }
       .sidebar-panel {
-        transition: width 0.3s ease-in-out;
-      }
-      .sidebar-panel.collapsed {
-        width: 50px !important;
+        transition: all 0.3s ease-in-out;
       }
     `;
     document.head.appendChild(style);
@@ -79,58 +73,81 @@ export const Sidebar = () => {
     >
       <ResizablePanel
         defaultSize={25}
-        minSize={isMobile ? 100 : 20}
-        maxSize={isMobile ? 100 : 40}
-        collapsible={!isMobile}
-        onCollapse={() => handleCollapse(true)}
-        onExpand={() => handleCollapse(false)}
+        minSize={isCollapsed ? 5 : (isMobile ? 100 : 20)}
+        maxSize={isCollapsed ? 5 : (isMobile ? 100 : 40)}
+        collapsible={false}
         className={cn(
           "flex flex-col sidebar-panel",
-          isCollapsed && !isMobile && "min-w-[50px] transition-all duration-300 ease-in-out"
+          isCollapsed && "max-w-[50px] min-w-[50px]"
         )}
       >
         <div className="flex h-14 items-center justify-between border-b px-2">
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={activeView === "chat" ? "default" : "ghost"}
-                    size="icon"
-                    className="h-9 w-9"
-                    onClick={() => handleViewChange("chat")}
-                  >
-                    <MessageSquare className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Chat View</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {!isCollapsed && (
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={activeView === "chat" ? "default" : "ghost"}
+                      size="icon"
+                      className="h-9 w-9"
+                      onClick={() => handleViewChange("chat")}
+                    >
+                      <MessageSquare className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Chat View</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={activeView === "history" ? "default" : "ghost"}
-                    size="icon"
-                    className="h-9 w-9"
-                    onClick={() => handleViewChange("history")}
-                  >
-                    <History className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>History View</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={activeView === "history" ? "default" : "ghost"}
+                      size="icon"
+                      className="h-9 w-9"
+                      onClick={() => handleViewChange("history")}
+                    >
+                      <History className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>History View</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 ml-auto"
+                  onClick={toggleSidebar}
+                >
+                  {isCollapsed ? (
+                    <PanelLeft className="h-5 w-5" />
+                  ) : (
+                    <PanelLeftClose className="h-5 w-5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isCollapsed ? "Expand" : "Collapse"} Sidebar</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        {!isCollapsed && (
+          <div className="flex-1 overflow-auto view-container">
+            {activeView === "chat" ? <Chat /> : <HistoryView />}
           </div>
-        </div>
-        <div className="flex-1 overflow-auto view-container">
-          {activeView === "chat" ? <Chat /> : <HistoryView />}
-        </div>
+        )}
       </ResizablePanel>
       {(!isMobile || !isCollapsed) && (
         <>
