@@ -11,7 +11,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export const Preview = () => {
+interface PreviewProps {
+  sourceCode?: string;
+}
+
+export const Preview = ({ sourceCode }: PreviewProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [view, setView] = useState<"preview" | "code">("preview");
   const [codeContent, setCodeContent] = useState<string>("");
@@ -20,15 +24,7 @@ export const Preview = () => {
   const handleViewChange = (newView: "preview" | "code") => {
     setView(newView);
     if (newView === "code") {
-      // In a real app, this would fetch the current file's content
-      setCodeContent(`// Example code content
-import React from 'react';
-
-const MyComponent = () => {
-  return <div>Hello World</div>;
-};
-
-export default MyComponent;`);
+      setCodeContent(sourceCode || "// No code available");
     }
     toast({
       title: `Switched to ${newView} view`,
@@ -37,26 +33,24 @@ export default MyComponent;`);
   };
 
   const handleExpand = () => {
-    setIsExpanded(!isExpanded);
+    setIsExpanded((prev) => !prev);
     const previewContainer = document.querySelector('.preview-container');
     if (previewContainer) {
       previewContainer.classList.toggle('expanded', !isExpanded);
     }
     toast({
-      title: isExpanded ? "Collapsed View" : "Expanded View",
-      description: `The preview is now ${isExpanded ? "collapsed" : "expanded"}.`,
+      title: !isExpanded ? "Expanded View" : "Collapsed View",
+      description: `The preview is now ${!isExpanded ? "expanded" : "collapsed"}.`,
     });
   };
 
   const handleBack = () => {
     if (isMobile) {
-      // Handle mobile back navigation
       window.history.back();
     }
   };
 
   useEffect(() => {
-    // Add expanded styles
     const style = document.createElement('style');
     style.innerHTML = `
       .preview-container.expanded {
@@ -66,6 +60,22 @@ export default MyComponent;`);
         width: 100vw;
         height: 100vh;
         z-index: 50;
+        background: var(--background);
+      }
+
+      .preview-content {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: var(--background);
+      }
+
+      .code-view {
+        padding: 1rem;
+        overflow: auto;
+        font-family: monospace;
+        white-space: pre-wrap;
+        background: var(--background);
       }
     `;
     document.head.appendChild(style);
@@ -137,17 +147,18 @@ export default MyComponent;`);
           </Tooltip>
         </TooltipProvider>
       </div>
-      <div className="flex-1 preview-container">
+      <div className={`flex-1 preview-container ${isExpanded ? 'expanded' : ''}`}>
         {view === "preview" ? (
           <div className="h-full w-full">
             <iframe
-              className="h-full w-full border-0"
+              className="preview-content"
               src="about:blank"
               title="Preview"
+              sandbox="allow-scripts allow-same-origin"
             />
           </div>
         ) : (
-          <div className="h-full w-full overflow-auto p-4 bg-background">
+          <div className="h-full w-full code-view">
             <pre className="text-sm">
               {codeContent}
             </pre>
@@ -157,3 +168,4 @@ export default MyComponent;`);
     </div>
   );
 };
+

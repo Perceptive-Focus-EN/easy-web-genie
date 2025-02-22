@@ -7,7 +7,7 @@ const Index = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col bg-background">
       <Header />
       <div className="flex-1 overflow-hidden">
         <Sidebar />
@@ -17,3 +17,4 @@ const Index = () => {
 };
 
 export default Index;
+
